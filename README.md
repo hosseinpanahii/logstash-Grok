@@ -19,7 +19,7 @@ The following configuration captures data from an input log “inlog.log” and 
 
 ## Logstash.conf
 The Logstash configuration file just copies the data from the inlog.log file using the input plugin and flushes the log data to outlog.log file using the output plugin.
----config
+---bash
 input {
    file {
       path => "C:/tpwork/logstash/bin/log/inlog.log"
