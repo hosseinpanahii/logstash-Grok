@@ -1,4 +1,4 @@
-# opensearch-logstash
+![image](https://github.com/user-attachments/assets/af70092d-91f4-4282-b1e2-b1326429675a)# opensearch-logstash
 
 ## Logstash Service Architecture
 Logstash processes logs from different servers and data sources and it behaves as the shipper. The shippers are used to collect the logs and these are installed in every input source. Brokers like Redis, Kafka or RabbitMQ are buffers to hold the data for indexers, there may be more than one brokers as failed over instances.
@@ -342,4 +342,112 @@ You can see that there is a new field named “user” in the output events.
    "user":"tutorialspoint.com","taskid":"48566","tags":[]
 }
 ```
+# Example
+## send Rsyslog to logstash
+
+```bash
+~] apt install rsyslog
+~] systemctl status rsyslog
+
+● rsyslog.service - System Logging Service
+     Loaded: loaded (/lib/systemd/system/rsyslog.service; enabled; preset: enabled)
+     Active: active (running) since Tue 2023-09-12 12:27:52 UTC; 25min ago
+TriggeredBy: ● syslog.socket
+       Docs: man:rsyslogd(8)
+             man:rsyslog.conf(5)
+             https://www.rsyslog.com/doc/
+   Main PID: 589 (rsyslogd)
+      Tasks: 4 (limit: 4644)
+     Memory: 3.4M
+        CPU: 27ms
+     CGroup: /system.slice/rsyslog.service
+             └─589 /usr/sbin/rsyslogd -n -iNONE
+
+```
+
+## rsyslog configuration (optional)
+```conf
+###########################
+#### GLOBAL DIRECTIVES ####
+###########################
+
+#
+# Use traditional timestamp format.
+# To enable high precision timestamps, comment out the following line.
+#
+$ActionFileDefaultTemplate RSYSLOG_TraditionalFileFormat
+
+
+
+###############
+#### RULES ####
+###############
+
+#
+*.*                        @127.0.0.1:5045 # (@ means udp,@@ means tcp)(logstash ip):logstash port listening;fter you can specify type of file like json
+# First some standard log files.  Log by facility.
+#
+auth,authpriv.*                 /var/log/auth/auth.log
+*.*;auth,authpriv.none;cron.none;lpr.none;mail.none;user.none;local5.none               -/var/log/syslog
+cron.*                          /var/log/cron/cron.log
+daemon.*                        -/var/log/daemon.log
+kern.*                          -/var/log/kern.log
+lpr.*                           -/var/log/lpr/lpr.log
+mail.*                          -/var/log/mail/mail.log
+user.*                          -/var/log/user/user.log
+# local5.*                        -/var/log/esets/nod32.log
+
+#
+# Logging for the mail system.  Split it up so that
+# it is easy to write scripts to parse these files.
+#
+mail.info                       -/var/log/mail/mail.info
+mail.warn                       -/var/log/mail/mail.warn
+mail.err                        /var/log/mail/mail.err
+
+```
+```bash
+systemctl restart rsyslog.service
+```
+## edit logstash/pipeline/logstash.conf
+
+```jsonc
+input {
+         udp {
+                type => "syslog-sako"
+                port => 5045
+                codec => "json"
+
+        }
+}
+
+
+filter {
+    }
+
+
+
+output {
+        opensearch {
+                hosts => ["https://opensearch-node1:9200", "https://opensearch-node2:9200", "https://opensearch-node3:9200"]
+                ssl => true
+                ssl_certificate_verification => false
+                user => "admin"
+                password => "admin"
+                index => "%{type}-log-%{+YYYY.MM.dd}"
+        } # end of syslog
+}
+```
+```bash
+docker-compose up -d logstash01
+```
+now,you can go to dashboard and in => index managment section => indexes and see the rsyslog
+![alt text](https://github.com/hosseinpanahii/logstash/blob/main/index%20managment.PNG)
+
+
+in dashboard managment you can add index pattern to discover logs
+so,in dashboard managment => index pattern => create index pattern like this:
+![alt text](https://github.com/hosseinpanahii/logstash/blob/main/index%20managment.PNG)
+
+finally, go back to dashboard and click on discover to view rsyslogs
 
