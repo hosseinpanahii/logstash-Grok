@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/af70092d-91f4-4282-b1e2-b1326429675a)# opensearch-logstash
+# opensearch-logstash
 
 ## Logstash Service Architecture
 Logstash processes logs from different servers and data sources and it behaves as the shipper. The shippers are used to collect the logs and these are installed in every input source. Brokers like Redis, Kafka or RabbitMQ are buffers to hold the data for indexers, there may be more than one brokers as failed over instances.
@@ -447,7 +447,8 @@ now,you can go to dashboard and in => index managment section => indexes and see
 
 in dashboard managment you can add index pattern to discover logs
 so,in dashboard managment => index pattern => create index pattern like this:
-![alt text](https://github.com/hosseinpanahii/logstash/blob/main/index%20managment.PNG)
+
+![alt text](https://github.com/hosseinpanahii/logstash/blob/main/index%20patterns.PNG)
 
 finally, go back to dashboard and click on discover to view rsyslogs
-
+![alt text](https://github.com/hosseinpanahii/logstash/blob/main/discover.PNG)
