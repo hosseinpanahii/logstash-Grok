@@ -1,7 +1,7 @@
 ## config geo in logstash
-1- Download GeoLite2-City.mmdb from  from the MaxMind site.
-2- edit docker-compose and bind volume to /usr/share/logstash/GeoLite2-City.mmdb
-3- edit pipline.conf like this:
+    1- Download GeoLite2-City.mmdb from  from the MaxMind site.
+    2- edit docker-compose and bind volume to /usr/share/logstash/GeoLite2-City.mmdb
+    3- edit pipline.conf like this:
 
 ```jsonc
 filter {
@@ -13,7 +13,7 @@ filter {
        database => "/usr/share/logstash/GeoLite2-City.mmdb"
        source => "remote_ip"
        target => "client_geo"
-    #   fields => [ "country_name", "ip" ] 
+       fields => [ "country_name", "ip" ] 
     }
 }
 ```
