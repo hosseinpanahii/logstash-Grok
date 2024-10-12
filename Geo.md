@@ -17,3 +17,5 @@ filter {
     }
 }
 ```
+
+    4 docker-compose restart logstash
